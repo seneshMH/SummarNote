@@ -162,4 +162,5 @@ cython_debug/
 /db
 /docs
 /offload
-/LaMini-Flan-T5-248M
+/models
+.chroma/
