@@ -1,23 +1,24 @@
-import os 
-import chromadb
-# from chromadb.config import Settings 
+from langchain.document_loaders import PyPDFLoader,CSVLoader, PDFMinerLoader, TextLoader, UnstructuredExcelLoader, Docx2txtLoader
+from langchain.document_loaders import UnstructuredFileLoader, UnstructuredMarkdownLoader
+import os
 
-# CHROMA_SETTINGS = Settings(
-#         chroma_db_impl='duckdb+parquet',
-#         persist_directory='db',
-#         anonymized_telemetry=False
-# )
 
 USE_PIPELINE = "text2text-generation"
 CHECKPOINT = "models/LaMini-Flan-T5-248M"
+INGEST_THREADS = os.cpu_count() or 8
 
-USE_GEMINI = True
+USE_GEMINI = False
 
-# from transformers import AutoTokenizer, AutoModelForCausalLM
-
-# checkpoint = "models/TinyMistral-248M-Instruct"
-# tokenizer = AutoTokenizer.from_pretrained(checkpoint)
-# base_model = AutoModelForCausalLM.from_pretrained(checkpoint,device_map='cuda:0',offload_folder='offload',torch_dtype=torch.float32)
-
-# 'text2text-generation'
-# "text-generation"
+DOCUMENT_MAP = {
+    ".txt": TextLoader,
+    ".md": UnstructuredMarkdownLoader,
+    ".py": TextLoader,
+    # ".pdf": PDFMinerLoader,
+    ".pdf": UnstructuredFileLoader,
+    # ".pdf": PyPDFLoader,
+    ".csv": CSVLoader,
+    ".xls": UnstructuredExcelLoader,
+    ".xlsx": UnstructuredExcelLoader,
+    ".docx": Docx2txtLoader,
+    ".doc": Docx2txtLoader,
+}
