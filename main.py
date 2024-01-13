@@ -1,9 +1,7 @@
-import logging
-
 from constants import USE_GEMINI
 
 import uvicorn
-from fastapi import FastAPI, UploadFile, File,Request
+from fastapi import FastAPI, UploadFile, File,Request,WebSocket
 from fastapi.exceptions import HTTPException
 import torch
 
@@ -42,8 +40,6 @@ async def chat(chat: str):
 async def upload_url(request: Request,data: dict):
    
     url = data.get('url')
-
-    logging.info(f"URL: {url}")
     if url is None:
         raise HTTPException(400, detail="Invalid URL")
     else:
@@ -87,6 +83,31 @@ async def upload_file_chat(file: UploadFile = File(...)):
 
     return {"File analysis done"}
 
+@app.websocket("/ws")
+async def websocket_endpoint(websocket : WebSocket):
+    await websocket.accept()
+
+    while True:
+        message = await websocket.receive()
+
+        print(message)
+
+        if isinstance(message,bytes):
+            break
+        else:
+            if message == "!<FIN>!":
+                await websocket.close()
+                break
+            if USE_GEMINI:
+                answer = process_answer_gemini(message['text'])
+            else:
+                answer = process_answer_local({'query': message['text']},base_model,tokenizer)
+                # response = chat.send_message([message['text']],stream=True)
+
+        # for chunk in answer:
+        #     await websocket.send_text(chunk.text)
+        await websocket.send_text(answer)
+        await websocket.send_text("<FIN>")
 
 if __name__=="__main__":
     uvicorn.run(app, host="127.0.0.1", port=8080)
