@@ -3,6 +3,8 @@ from constants import USE_GEMINI
 import uvicorn
 from fastapi import FastAPI, UploadFile, File,Request,WebSocket
 from fastapi.exceptions import HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+
 import torch
 
 from summary import create_summary
@@ -12,8 +14,20 @@ from logger import setup_logger
 from qa_local import data_ingestion_local,process_answer_local
 from qa_gemini import data_ingestion_gemini,process_answer_gemini
 
+from clear import clear_db,clear_docs
+
+from pathlib import Path
+
 app = FastAPI()
 setup_logger()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
@@ -40,10 +54,12 @@ async def chat(chat: str):
 async def upload_url(request: Request,data: dict):
    
     url = data.get('url')
+    print(url)
     if url is None:
         raise HTTPException(400, detail="Invalid URL")
     else:
         summary = create_summary(url,base_model,tokenizer,type="url")
+        clear_db()
 
     return {"summary": summary}
 
@@ -51,15 +67,23 @@ async def upload_url(request: Request,data: dict):
 @app.post("/summary-from-file")
 async def upload_file_summary(request: Request,file: UploadFile = File(...)):
     try:
+        
+        print(file.filename)
+
         if file.content_type != "application/pdf":
             raise HTTPException(400, detail="Invalid document type")
         else:
-            filepath = "docs/" + file.filename
+            filename = Path(file.filename).name
+            print(filename)
+            filepath = "docs/" + filename
             content = await file.read()
             with open(filepath, "wb") as temp_file:
                 temp_file.write(content)
 
             summary = create_summary("docs",base_model,tokenizer,type="file")
+
+            clear_db()
+            clear_docs()
 
             return {"summary": summary}
     except Exception as e:
@@ -72,7 +96,8 @@ async def upload_file_chat(file: UploadFile = File(...)):
     if file.content_type != "application/pdf":
         raise HTTPException(400, detail="Invalid document type")
     else:
-        filepath = "docs/" + file.filename
+        filename = Path(file.filename).name
+        filepath = "docs/" + filename
         content = await file.read()
         with open(filepath, "wb") as temp_file:
             temp_file.write(content)
@@ -95,8 +120,11 @@ async def websocket_endpoint(websocket : WebSocket):
         if isinstance(message,bytes):
             break
         else:
-            if message == "!<FIN>!":
+            if message['text'] == "!<FIN>!":
                 await websocket.close()
+                clear_db()
+                clear_docs()
+                print("Connection closed")
                 break
             if USE_GEMINI:
                 answer = process_answer_gemini(message['text'])
@@ -109,5 +137,10 @@ async def websocket_endpoint(websocket : WebSocket):
         await websocket.send_text(answer)
         await websocket.send_text("<FIN>")
 
+#ping route
+@app.get("/ping")
+async def ping():
+    return "connected"
+
 if __name__=="__main__":
-    uvicorn.run(app, host="127.0.0.1", port=8080)
+    uvicorn.run(app, host="0.0.0.0", port=8080)
