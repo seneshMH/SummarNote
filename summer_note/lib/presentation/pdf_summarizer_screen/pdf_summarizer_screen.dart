@@ -7,7 +7,6 @@ import 'package:summer_note/widgets/app_bar/appbar_subtitle_one.dart';
 import 'package:summer_note/widgets/app_bar/custom_app_bar.dart';
 import 'package:summer_note/widgets/custom_elevated_button.dart';
 import 'package:summer_note/widgets/custom_icon_button.dart';
-import 'package:summer_note/widgets/custom_text_form_field.dart';
 import 'package:flutter/services.dart';
 import 'package:share_plus/share_plus.dart';
 import 'dart:io';
@@ -22,7 +21,7 @@ class PdfSummarizerScreen extends StatefulWidget {
 }
 
 class _PdfSummarizerScreenState extends State<PdfSummarizerScreen> {
-  bool isParagraphView = true;
+  bool isParagraphView = false;
   TextEditingController keySevenController = TextEditingController();
 
   @override

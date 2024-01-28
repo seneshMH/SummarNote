@@ -1,5 +1,4 @@
 import 'package:summer_note/models/summary_model.dart';
-import 'package:summer_note/utils/ip.dart';
 
 import '../homepage_screen/widgets/homepage_item_widget.dart';
 import '../homepage_screen/widgets/img2section_item_widget.dart';
@@ -43,9 +42,9 @@ class HomepageScreen extends StatelessWidget {
                       height: 488.v,
                       width: 359.h,
                       child: Stack(alignment: Alignment.topCenter, children: [
-                        //_buildFortySevenSection(context),
-                        _buildSummarizerSection(context)
-                      ]))
+                        _buildFortySevenSection(context),
+                        _buildSummarizerSection(context),
+                      ])),
                 ]))));
   }
 
@@ -129,62 +128,99 @@ class HomepageScreen extends StatelessWidget {
   /// Section Widget
   Widget _buildFortySevenSection(BuildContext context) {
     return Align(
-        alignment: Alignment.bottomCenter,
-        child: Container(
-            padding: EdgeInsets.symmetric(horizontal: 39.h, vertical: 31.v),
-            decoration: BoxDecoration(
-                image: DecorationImage(
-                    image: AssetImage(ImageConstant.imgGroup47),
-                    fit: BoxFit.cover)),
-            child: Column(mainAxisSize: MainAxisSize.min, children: [
-              Text("Welcome to SummarNote",
-                  style: CustomTextStyles.titleSmallPoppins),
-              // SizedBox(height: 12.v),
-              // SizedBox(height: 20.v)
-            ])));
+      alignment: Alignment.bottomCenter,
+      child: Container(
+        width: double.infinity, // Set width to take the full available width
+        padding: EdgeInsets.symmetric(horizontal: 20.h, vertical: 31.v),
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage(ImageConstant.imgGroup47),
+            fit: BoxFit.fill,
+          ),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text("Welcome to SummarNote",
+                style: CustomTextStyles.titleSmallPoppins),
+            SizedBox(height: 12.v),
+            SizedBox(height: 20.v),
+          ],
+        ),
+      ),
+    );
   }
 
-  /// Section Widget
   Widget _buildSummarizerSection(BuildContext context) {
     return Align(
       alignment: Alignment.topCenter,
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: 25.h),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Text("Try Summarizer", style: theme.textTheme.headlineSmall),
-            SizedBox(height: 9.v),
-            Container(
-              width: double.infinity,
-              child: HomepageItemWidget(
-                  onTapPdfSummarizer: () {
-                    onTapPdfSummarizer(context);
-                  },
-                  imagePath: ImageConstant.imgFile,
-                  title: "File Summarize"),
-            ),
-            SizedBox(height: 16.0), // Adjust the height as needed
-            Container(
-              width: double.infinity,
-              child: HomepageItemWidget(
-                  onTapPdfSummarizer: () {
-                    onTapLinkSummarizer(context);
-                  },
-                  imagePath: ImageConstant.imgLink,
-                  title: "Link Summarizer"),
-            ),
-            SizedBox(height: 16.0), // Adjust the height as needed
-            Container(
-              width: double.infinity,
-              child: HomepageItemWidget(
-                  onTapPdfSummarizer: () {
-                    onTapFileChat(context);
-                  },
-                  imagePath: ImageConstant.chatIcon,
-                  title: "File Chat"),
-            ),
-          ],
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Text("Try Summarizer", style: theme.textTheme.headlineSmall),
+              SizedBox(height: 9.v),
+              Row(
+                mainAxisAlignment:
+                    MainAxisAlignment.spaceBetween, // Adjust as needed
+                children: [
+                  Container(
+                    width: 150.h,
+                    height: 130.v, // Adjust the width as needed
+                    child: HomepageItemWidget(
+                      onTapPdfSummarizer: () {
+                        onTapPdfSummarizer(context);
+                      },
+                      imagePath: ImageConstant.imgFile,
+                      title: "File Summary",
+                    ),
+                  ),
+                  Container(
+                    width: 150.h,
+                    height: 130.v, // Adjust the width as needed
+                    child: HomepageItemWidget(
+                      onTapPdfSummarizer: () {
+                        onTapLinkSummarizer(context);
+                      },
+                      imagePath: ImageConstant.imgLink,
+                      title: "Link Summary",
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 16.0), // Adjust the height as needed
+              Row(
+                mainAxisAlignment:
+                    MainAxisAlignment.spaceBetween, // Adjust as needed
+                children: [
+                  Container(
+                    width: 150.h,
+                    height: 130.v, // Adjust the width as needed
+                    child: HomepageItemWidget(
+                      onTapPdfSummarizer: () {
+                        onTapLinkSummarizer(context);
+                      },
+                      imagePath: ImageConstant.imgParagraph,
+                      title: "Best Sentences",
+                    ),
+                  ),
+                  Container(
+                    width: 150.h,
+                    height: 130.v, // Adjust the width as needed
+                    child: HomepageItemWidget(
+                      onTapPdfSummarizer: () {
+                        onTapFileChat(context);
+                      },
+                      imagePath: ImageConstant.chatIcon,
+                      title: "File Chat",
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
