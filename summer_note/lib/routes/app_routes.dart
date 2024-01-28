@@ -61,7 +61,7 @@ class AppRoutes {
     docSummarizerScreen: (context) => DocSummarizerScreen(),
     pdfuploadScreen: (context) => PdfuploadScreen(),
     docuploadScreen: (context) => DocuploadScreen(),
-    textSummarizerScreen: (context) => TextSummarizerScreen(),
+    //textSummarizerScreen: (context) => TextSummarizerScreen(),
     linkSummarizerScreen: (context) => LinkSummarizerScreen(),
     textuploadScreen: (context) => TextuploadScreen(),
     linkuploadScreen: (context) => LinkuploadScreen(),

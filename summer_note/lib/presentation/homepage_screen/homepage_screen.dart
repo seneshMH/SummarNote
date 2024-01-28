@@ -39,7 +39,7 @@ class HomepageScreen extends StatelessWidget {
                               dotHeight: 10.v,
                               dotWidth: 10.h))),
                   SizedBox(
-                      height: 488.v,
+                      height: 480.v,
                       width: 359.h,
                       child: Stack(alignment: Alignment.topCenter, children: [
                         _buildFortySevenSection(context),
@@ -132,6 +132,7 @@ class HomepageScreen extends StatelessWidget {
       child: Container(
         width: double.infinity, // Set width to take the full available width
         padding: EdgeInsets.symmetric(horizontal: 20.h, vertical: 31.v),
+
         decoration: BoxDecoration(
           image: DecorationImage(
             image: AssetImage(ImageConstant.imgGroup47),
@@ -174,7 +175,7 @@ class HomepageScreen extends StatelessWidget {
                         onTapPdfSummarizer(context);
                       },
                       imagePath: ImageConstant.imgFile,
-                      title: "File Summary",
+                      title: "File Summarizer",
                     ),
                   ),
                   Container(
@@ -185,7 +186,7 @@ class HomepageScreen extends StatelessWidget {
                         onTapLinkSummarizer(context);
                       },
                       imagePath: ImageConstant.imgLink,
-                      title: "Link Summary",
+                      title: "Link Summarizer",
                     ),
                   ),
                 ],
@@ -200,7 +201,7 @@ class HomepageScreen extends StatelessWidget {
                     height: 130.v, // Adjust the width as needed
                     child: HomepageItemWidget(
                       onTapPdfSummarizer: () {
-                        onTapLinkSummarizer(context);
+                        onTapBestSentences(context);
                       },
                       imagePath: ImageConstant.imgParagraph,
                       title: "Best Sentences",
@@ -214,7 +215,7 @@ class HomepageScreen extends StatelessWidget {
                         onTapFileChat(context);
                       },
                       imagePath: ImageConstant.chatIcon,
-                      title: "File Chat",
+                      title: "Chat With     File",
                     ),
                   ),
                 ],
@@ -235,6 +236,10 @@ class HomepageScreen extends StatelessWidget {
   onTapLinkSummarizer(BuildContext context) {
     Navigator.pushNamed(context, AppRoutes.linkuploadScreen,
         arguments: {'summaries': summaries});
+  }
+
+  onTapBestSentences(BuildContext context) {
+    Navigator.pushNamed(context, AppRoutes.textuploadScreen);
   }
 
   onTapFileChat(BuildContext context) {

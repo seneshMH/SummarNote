@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:path/path.dart' as Path;
 
 import 'package:summer_note/core/app_export.dart';
 import 'package:summer_note/models/summary_model.dart';
@@ -21,6 +22,7 @@ class PdfsummarizecomponentItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    String fileName = Path.basename(summary.title);
     return InkWell(
         onTap: () {
           Navigator.of(context).push(MaterialPageRoute(
@@ -53,7 +55,7 @@ class PdfsummarizecomponentItemWidget extends StatelessWidget {
                     Padding(
                       padding: EdgeInsets.only(left: 4.h),
                       child: Text(
-                        summary.title,
+                        fileName,
                         style: CustomTextStyles.titleLargeSemiBold,
                       ),
                     ),

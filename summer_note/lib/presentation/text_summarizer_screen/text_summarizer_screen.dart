@@ -1,24 +1,34 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:summer_note/core/app_export.dart';
+import 'package:summer_note/models/summary_model.dart';
 import 'package:summer_note/widgets/app_bar/appbar_leading_image.dart';
-import 'package:summer_note/widgets/app_bar/appbar_subtitle.dart';
 import 'package:summer_note/widgets/app_bar/appbar_subtitle_one.dart';
-import 'package:summer_note/widgets/app_bar/appbar_trailing_image.dart';
 import 'package:summer_note/widgets/app_bar/custom_app_bar.dart';
 import 'package:summer_note/widgets/custom_elevated_button.dart';
 import 'package:summer_note/widgets/custom_icon_button.dart';
-import 'package:summer_note/widgets/custom_text_form_field.dart';
+import 'package:flutter/services.dart';
+import 'package:share_plus/share_plus.dart';
+import 'dart:io';
 
-class TextSummarizerScreen extends StatelessWidget {
-  TextSummarizerScreen({Key? key})
-      : super(
-          key: key,
-        );
+class TextSummarizerScreen extends StatefulWidget {
+  final Summary summary;
 
+  TextSummarizerScreen({Key? key, required this.summary}) : super(key: key);
+
+  @override
+  _TextSummarizerScreenState createState() => _TextSummarizerScreenState();
+}
+
+class _TextSummarizerScreenState extends State<TextSummarizerScreen> {
+  bool isParagraphView = false;
   TextEditingController keySevenController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
+    List<String> words = widget.summary.body.split(' ');
+    int wordCount = words.length;
+
     return SafeArea(
       child: Scaffold(
         resizeToAvoidBottomInset: false,
@@ -26,7 +36,7 @@ class TextSummarizerScreen extends StatelessWidget {
           width: double.maxFinite,
           child: Column(
             children: [
-              _buildEleven(context),
+              _buildFive(context),
               Expanded(
                 child: SingleChildScrollView(
                   child: Container(
@@ -41,7 +51,7 @@ class TextSummarizerScreen extends StatelessWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
-                          "Summarized Content",
+                          "Extracted Content",
                           style: theme.textTheme.titleMedium,
                         ),
                         SizedBox(height: 13.v),
@@ -69,26 +79,30 @@ class TextSummarizerScreen extends StatelessWidget {
                                     width: 16.adaptSize,
                                   ),
                                 ),
+                                onPressed: () {
+                                  setState(() {
+                                    isParagraphView = true;
+                                  });
+                                },
                               ),
                               Padding(
                                 padding: EdgeInsets.only(left: 4.h),
-                                child: CustomTextFormField(
+                                child: CustomElevatedButton(
                                   width: 111.h,
-                                  controller: keySevenController,
-                                  hintText: "Bullets",
-                                  textInputAction: TextInputAction.done,
-                                  prefix: Container(
-                                    margin: EdgeInsets.fromLTRB(
-                                        8.h, 5.v, 12.h, 4.v),
+                                  text: "Points",
+                                  leftIcon: Container(
+                                    margin: EdgeInsets.only(right: 6.h),
                                     child: CustomImageView(
-                                      imagePath: ImageConstant.imgBullets,
+                                      imagePath: ImageConstant.imgParagraph,
                                       height: 16.adaptSize,
                                       width: 16.adaptSize,
                                     ),
                                   ),
-                                  prefixConstraints: BoxConstraints(
-                                    maxHeight: 26.v,
-                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      isParagraphView = false;
+                                    });
+                                  },
                                 ),
                               ),
                             ],
@@ -102,7 +116,7 @@ class TextSummarizerScreen extends StatelessWidget {
                           child: Padding(
                             padding: EdgeInsets.only(left: 3.h),
                             child: Text(
-                              "Words: 534",
+                              "Words: $wordCount",
                               style: theme.textTheme.labelMedium,
                             ),
                           ),
@@ -118,6 +132,15 @@ class TextSummarizerScreen extends StatelessWidget {
                               child: CustomImageView(
                                 imagePath: ImageConstant.imgCopy,
                               ),
+                              onTap: () {
+                                Clipboard.setData(
+                                    ClipboardData(text: widget.summary.body));
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text('Text copied to clipboard'),
+                                  ),
+                                );
+                              },
                             ),
                             Padding(
                               padding: EdgeInsets.only(left: 15.h),
@@ -128,6 +151,17 @@ class TextSummarizerScreen extends StatelessWidget {
                                 child: CustomImageView(
                                   imagePath: ImageConstant.imgDownload,
                                 ),
+                                onTap: () {
+                                  _saveTextToFile(widget.summary.body)
+                                      .then((String filePath) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content:
+                                            Text('File saved to: $filePath'),
+                                      ),
+                                    );
+                                  });
+                                },
                               ),
                             ),
                             Padding(
@@ -139,6 +173,9 @@ class TextSummarizerScreen extends StatelessWidget {
                                 child: CustomImageView(
                                   imagePath: ImageConstant.imgShareAlt,
                                 ),
+                                onTap: () {
+                                  Share.share(widget.summary.body);
+                                },
                               ),
                             ),
                           ],
@@ -156,19 +193,35 @@ class TextSummarizerScreen extends StatelessWidget {
     );
   }
 
-  /// Section Widget
-  Widget _buildEleven(BuildContext context) {
+  Future<String> _saveTextToFile(String textContent) async {
+    try {
+      String? outputFile = await FilePicker.platform
+          .saveFile(dialogTitle: 'Save Your File to desired location');
+
+      File returnedFile = File('$outputFile');
+      await returnedFile.writeAsString(textContent);
+
+      // Return the file path
+      return returnedFile.path;
+    } catch (e) {
+      // Handle errors
+      print('Error saving file: $e');
+      return '';
+    }
+  }
+
+  Widget _buildFive(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(vertical: 5.v),
+      padding: EdgeInsets.symmetric(vertical: 7.v),
       decoration: AppDecoration.fillPrimary,
       child: Column(
         children: [
           CustomAppBar(
-            leadingWidth: 32.h,
+            leadingWidth: 36.h,
             leading: AppbarLeadingImage(
               imagePath: ImageConstant.imgArrowLeft,
               margin: EdgeInsets.only(
-                left: 14.h,
+                left: 18.h,
                 top: 1.v,
                 bottom: 2.v,
               ),
@@ -176,38 +229,27 @@ class TextSummarizerScreen extends StatelessWidget {
             title: AppbarSubtitleOne(
               text: "Back",
               margin: EdgeInsets.only(left: 4.h),
+              onTap: () {
+                onTapBack(context);
+              },
             ),
-            actions: [
-              AppbarSubtitle(
-                text: "History",
-                margin: EdgeInsets.only(
-                  left: 19.h,
-                  top: 1.v,
-                ),
-              ),
-              AppbarTrailingImage(
-                imagePath: ImageConstant.imgArrowLeft,
-                margin: EdgeInsets.fromLTRB(3.h, 1.v, 19.h, 2.v),
-              ),
-            ],
           ),
-          SizedBox(height: 8.v),
+          SizedBox(height: 4.v),
           Text(
-            "Text File Summarizer",
+            "Extract Best Sentences",
             style: theme.textTheme.titleLarge,
           ),
-          SizedBox(height: 1.v),
+          SizedBox(height: 2.v),
           Text(
             "Results",
             style: CustomTextStyles.titleLargeSemiBold,
           ),
-          SizedBox(height: 1.v),
+          SizedBox(height: 2.v),
         ],
       ),
     );
   }
 
-  /// Section Widget
   Widget _buildContent(BuildContext context) {
     return Container(
       padding: EdgeInsets.symmetric(
@@ -222,15 +264,15 @@ class TextSummarizerScreen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Expanded(
-            child: SizedBox(
-              width: 272.h,
-              child: Text(
-                "                    William Shakespeare, born in 1564 in Stratford-upon-Avon, England, is celebrated as the world's greatest playwright, leaving an enduring legacy in literature and drama. His timeless works, such as \"Romeo and Juliet\" and \"Hamlet,\" explore universal themes like love, betrayal, and the complexities of human nature, making them enduring classics performed globally.\r\n\r\n     Beyond his narrative prowess, Shakespeare's linguistic influence is profound. He coined numerous words and phrases, enriching the English language and becoming integral to everyday speech. His unparalleled mastery of language, combined with insightful explorations of the human condition, distinguishes him as a literary giant.\r\n\r\n        Despite the passage of time, Shakespeare's impact endures. His works are studied, performed, and cherished worldwide, ensuring his lasting legacy in the cultural tapestry of humanity. From the stage to everyday language, Shakespeare's contributions continue to shape literature and communication, solidifying his status as a literary icon.\n\n        ",
-                maxLines: 27,
-                overflow: TextOverflow.ellipsis,
-                textAlign: TextAlign.justify,
-                style: theme.textTheme.bodySmall!.copyWith(
-                  height: 1.20,
+            child: Scrollbar(
+              // Set this to true to always show the scrollbar
+              child: SingleChildScrollView(
+                scrollDirection: Axis.vertical,
+                child: SizedBox(
+                  width: 272.h,
+                  child: isParagraphView
+                      ? _buildParagraphView(context)
+                      : _buildBulletPointView(context),
                 ),
               ),
             ),
@@ -243,36 +285,52 @@ class TextSummarizerScreen extends StatelessWidget {
               top: 40.v,
               bottom: 56.v,
             ),
-            child: Stack(
-              alignment: Alignment.topRight,
-              children: [
-                Align(
-                  alignment: Alignment.center,
-                  child: SizedBox(
-                    height: 300.v,
-                    child: VerticalDivider(
-                      width: 6.h,
-                      thickness: 6.v,
-                    ),
-                  ),
-                ),
-                Align(
-                  alignment: Alignment.topRight,
-                  child: SizedBox(
-                    height: 193.v,
-                    child: VerticalDivider(
-                      width: 5.h,
-                      thickness: 5.v,
-                      color: appTheme.gray800,
-                      indent: 2.h,
-                    ),
-                  ),
-                ),
-              ],
-            ),
           ),
         ],
       ),
     );
+  }
+
+  Widget _buildParagraphView(BuildContext context) {
+    return SizedBox(
+      width: 272.h,
+      child: Text(
+        widget.summary.body,
+        textAlign: TextAlign.justify,
+        style: theme.textTheme.bodySmall!.copyWith(
+          fontSize: 18.0,
+          height: 1.20,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBulletPointView(BuildContext context) {
+    List<String> lines = widget.summary.body.split('.');
+
+    // Filter out empty lines before mapping to bullet points
+    lines = lines.where((line) => line.trim().isNotEmpty).toList();
+
+    String bulletPointsText = lines
+        .map((line) => '• $line') // Prefix each line with a bullet point
+        .join(
+            '\n\n'); // Add an additional newline character between bullet points
+
+    return SizedBox(
+      width: 272.h,
+      child: Text(
+        bulletPointsText,
+        textAlign: TextAlign.justify,
+        style: theme.textTheme.bodySmall!.copyWith(
+          fontSize: 14.0,
+          height: 1.20,
+        ),
+      ),
+    );
+  }
+
+  void onTapBack(BuildContext context) {
+    //navigate back to home screen
+    Navigator.pushNamed(context, AppRoutes.homepageScreen);
   }
 }

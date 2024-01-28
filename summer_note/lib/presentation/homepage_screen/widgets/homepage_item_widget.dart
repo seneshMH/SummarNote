@@ -37,13 +37,15 @@ class HomepageItemWidget extends StatelessWidget {
             SizedBox(height: 13.v),
             CustomImageView(
               imagePath: imagePath,
-              height: 65.v,
+              height: 48.v,
               width: 48.h,
+              alignment: Alignment.center,
             ),
             SizedBox(height: 3.v),
             Text(
               title,
-              style: theme.textTheme.titleLarge,
+              style: theme.textTheme.titleMedium,
+              textAlign: TextAlign.center,
             ),
           ],
         ),
