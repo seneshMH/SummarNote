@@ -11,6 +11,8 @@ from summary import create_summary
 from load_models import load_local_llm,load_gemini_llm
 from logger import setup_logger
 
+from extractbest import extract
+
 from qa_local import data_ingestion_local,process_answer_local
 from qa_gemini import data_ingestion_gemini,process_answer_gemini
 
@@ -137,10 +139,20 @@ async def websocket_endpoint(websocket : WebSocket):
         await websocket.send_text(answer)
         await websocket.send_text("<FIN>")
 
+
+@app.post("/extract")
+async def extract_best(text: str):
+    # text = data.get('text')
+    if text is None:
+        raise HTTPException(400, detail="Invalid text")
+    else:
+        best_sentences = extract(text)
+        return {"best_sentences": best_sentences}
+
 #ping route
 @app.get("/ping")
 async def ping():
     return "connected"
 
 if __name__=="__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8080)
+    uvicorn.run(app, host="127.0.0.1", port=8080)
