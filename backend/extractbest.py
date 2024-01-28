@@ -1,7 +1,9 @@
 import re
 import nltk
 import string
-import heapq
+import numpy as np
+import networkx as nx
+from nltk.cluster.util import cosine_distance
 
 nltk.download('punkt')
 nltk.download('stopwords')
@@ -17,70 +19,57 @@ def preprocess(text):
 
   return formatted_text
 
+def calculate_sentence_similarity(sentence1, sentence2):
+  words1 = [word for word in nltk.word_tokenize(sentence1)]
+  words2 = [word for word in nltk.word_tokenize(sentence2)]
+  all_words = list(set(words1 + words2))
+  vector1 = [0] * len(all_words)
+  vector2 = [0] * len(all_words)
+  
+  for word in words1: # Bag of words
+    #print(word)
+    vector1[all_words.index(word)] += 1
+  for word in words2:
+    vector2[all_words.index(word)] += 1
 
-def calculate_sentences_score(sentences, important_words, distance):
-  scores = []
-  sentence_index = 0
+  return 1 - cosine_distance(vector1, vector2)
 
-  for sentence in [nltk.word_tokenize(sentence) for sentence in sentences]:
-    word_index = []
-    for word in important_words:
-      try:
-        word_index.append(sentence.index(word))
-      except ValueError:
-        pass
+def calculate_similarity_matrix(sentences):
+  similarity_matrix = np.zeros((len(sentences), len(sentences)))
+  #print(similarity_matrix)
+  for i in range(len(sentences)):
+    for j in range(len(sentences)):
+      if i == j:
+        continue
+      similarity_matrix[i][j] = calculate_sentence_similarity(sentences[i], sentences[j])
+  return similarity_matrix
 
-    word_index.sort()
-
-    if len(word_index) == 0:
-      continue
-
-    groups_list = []
-    group = [word_index[0]]
-    i = 1 # 3
-    while i < len(word_index): # 3
-      # first execution: 1 - 0 = 1
-      # second execution: 2 - 1 = 1
-      if word_index[i] - word_index[i - 1] < distance:
-        group.append(word_index[i])
-      else:
-        groups_list.append(group[:])
-        group = [word_index[i]]
-      i += 1
-    groups_list.append(group)
-
-    max_group_score = 0
-    for g in groups_list:
-      #print(g)
-      important_words_in_group = len(g)
-      total_words_in_group = g[-1] - g[0] + 1
-      score = 1.0 * important_words_in_group**2 / total_words_in_group
-
-      if score > max_group_score:
-        max_group_score = score
-
-    scores.append((max_group_score, sentence_index))
-    sentence_index += 1
-  return scores
-
-
-def summarize(text, top_n_words, distance, number_of_sentences, percentage = 0):
+def summarize(text, number_of_sentences, percentage = 0):
   original_sentences = [sentence for sentence in nltk.sent_tokenize(text)]
   formatted_sentences = [preprocess(original_sentence) for original_sentence in original_sentences]
-  words = [word for sentence in formatted_sentences for word in nltk.word_tokenize(sentence)]
-  frequency = nltk.FreqDist(words)
-  top_n_words = [word[0] for word in frequency.most_common(top_n_words)]
-  sentences_score = calculate_sentences_score(formatted_sentences, top_n_words, distance)
+  similarity_matrix = calculate_similarity_matrix(formatted_sentences)
+  #print(similarity_matrix)
+
+  similarity_graph = nx.from_numpy_array(similarity_matrix)
+  #print(similarity_graph.nodes)
+  #print(similarity_graph.edges)
+
+  scores = nx.pagerank(similarity_graph)
+  #print(scores)
+  ordered_scores = sorted(((scores[i], score) for i, score in enumerate(original_sentences)), reverse=True)
+  #print(ordered_scores)
+
   if percentage > 0:
-    best_sentences = heapq.nlargest(int(len(formatted_sentences) * percentage), sentences_score)
-  else:  
-    best_sentences = heapq.nlargest(number_of_sentences, sentences_score)
-  best_sentences = [original_sentences[i] for (score, i) in best_sentences]
+    number_of_sentences = int(len(formatted_sentences) * percentage)
 
-  return  best_sentences
+  best_sentences = []
+  for sentence in range(number_of_sentences):
+    best_sentences.append(ordered_scores[sentence][1])
+  
+  return best_sentences
 
-def extract(original_text):
-  best_sentences = summarize(original_text, 5, 2, 3)
+def extract(original_text,percentage):
+  best_sentences = summarize(original_text,5, percentage=percentage)
   return  best_sentences
 
 

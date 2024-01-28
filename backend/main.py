@@ -141,12 +141,14 @@ async def websocket_endpoint(websocket : WebSocket):
 
 
 @app.post("/extract")
-async def extract_best(text: str):
-    # text = data.get('text')
+async def extract_best(data: dict):
+    text = data.get('text')
+    percentage = data.get('percentage')
     if text is None:
         raise HTTPException(400, detail="Invalid text")
     else:
-        best_sentences = extract(text)
+        best_sentences = extract(text,percentage)
+        print(best_sentences)
         return {"best_sentences": best_sentences}
 
 #ping route
@@ -155,4 +157,4 @@ async def ping():
     return "connected"
 
 if __name__=="__main__":
-    uvicorn.run(app, host="127.0.0.1", port=8080)
+    uvicorn.run(app, host="0.0.0.0", port=8080)
