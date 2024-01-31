@@ -3,15 +3,23 @@ import 'package:flutter/services.dart';
 //import 'package:flutter/scheduler.dart';
 import 'core/app_export.dart';
 import 'package:device_preview/device_preview.dart';
+import 'package:window_manager/window_manager.dart';
+import 'dart:io';
 
 var globalMessengerKey = GlobalKey<ScaffoldMessengerState>();
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
   ]);
 
   ThemeHelper().changeTheme('primary');
+
+  await windowManager.ensureInitialized();
+  if (Platform.isWindows) {
+    WindowManager.instance.setMinimumSize(const Size(375, 812));
+    WindowManager.instance.setMaximumSize(const Size(375, 812));
+  }
   runApp(MyApp());
 }
 

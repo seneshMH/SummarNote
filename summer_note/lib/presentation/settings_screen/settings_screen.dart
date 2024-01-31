@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:summer_note/core/app_export.dart';
 import 'package:summer_note/utils/ip.dart';
 import 'package:summer_note/widgets/custom_drop_down_button.dart';
@@ -161,7 +162,9 @@ class SettingsScreen extends StatelessWidget {
                               height: 24.adaptSize,
                               width: 24.adaptSize)),
                       prefixConstraints: BoxConstraints(maxHeight: 36.v),
-                      onChanged: (value) {})),
+                      onTap: () {
+                        share(context);
+                      })),
               SizedBox(height: 66.0),
               Align(
                 alignment: Alignment.center,
@@ -395,6 +398,11 @@ For technical assistance or general inquiries, contact our support team at suppo
         );
       },
     );
+  }
+
+  void share(BuildContext context) {
+    Share.share(
+        "SummarNote is a document summarization app that uses AI to generate summaries of documents. Download it now at https://www.summarnote.com/");
   }
 
   void submit(BuildContext context) async {
