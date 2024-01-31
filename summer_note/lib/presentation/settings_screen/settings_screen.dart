@@ -3,14 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:summer_note/core/app_export.dart';
 import 'package:summer_note/utils/ip.dart';
 import 'package:summer_note/widgets/custom_drop_down.dart';
+import 'package:summer_note/widgets/custom_drop_down_button.dart';
 
 // ignore_for_file: must_be_immutable
 class SettingsScreen extends StatelessWidget {
-  List<String> dropdownItemList = ["Item One", "Item Two", "Item Three"];
-  List<String> dropdownItemList1 = ["Item One", "Item Two", "Item Three"];
-  List<String> dropdownItemList2 = ["Item One", "Item Two", "Item Three"];
-  List<String> dropdownItemList3 = ["Item One", "Item Two", "Item Three"];
-  List<String> dropdownItemList4 = ["Item One", "Item Two", "Item Three"];
+  List<String> dropdownItemList = [];
+  List<String> dropdownItemList1 = [];
+  List<String> dropdownItemList2 = [];
+  List<String> dropdownItemList3 = [];
+  List<String> dropdownItemList4 = [];
 
   late TextEditingController ipAddressController = TextEditingController();
 
@@ -36,7 +37,6 @@ class SettingsScreen extends StatelessWidget {
             children: [
               _buildHeaderSection(context),
               SizedBox(height: 20.0),
-
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 21.0),
                 child: Row(
@@ -82,37 +82,86 @@ class SettingsScreen extends StatelessWidget {
                   ],
                 ),
               ),
-
               SizedBox(height: 20.0),
-
-              // Custom dropdown menus
               Padding(
-                padding: EdgeInsets.only(left: 21.0, right: 21.0),
-                child: ListTile(
-                  title: Center(
-                    child: Text(
-                      "About",
-                      style: TextStyle(
-                        color: Colors.black, // Set your desired text color
-                        fontSize: 18.0, // Set your desired font size
-                        fontWeight:
-                            FontWeight.bold, // Set your desired font weight
-                      ),
-                    ),
-                  ),
-                  tileColor:
-                      Colors.yellowAccent, // Set your desired button color
-                  onTap: () {
-                    _showAboutDialog(context);
-                  },
-                ),
-              ),
-
-              // Similar blocks for other dropdown menus...
-              // (existing code)
-
-              Spacer(),
-
+                  padding: EdgeInsets.only(left: 21.h, right: 60.h),
+                  child: CustomDropDownButton(
+                    hintText: "Terms & Conditions",
+                    items: dropdownItemList,
+                    prefix: Container(
+                        margin: EdgeInsets.fromLTRB(4.h, 6.v, 7.h, 5.v),
+                        child: CustomImageView(
+                            imagePath: ImageConstant.imgPolicies,
+                            height: 25.adaptSize,
+                            width: 25.adaptSize)),
+                    prefixConstraints: BoxConstraints(maxHeight: 36.v),
+                    onTap: () {
+                      _showTermsAndConditionsDialog(context);
+                    },
+                  )),
+              SizedBox(height: 21.v),
+              Padding(
+                  padding: EdgeInsets.only(left: 21.h, right: 60.h),
+                  child: CustomDropDownButton(
+                    hintText: "About",
+                    items: dropdownItemList1,
+                    prefix: Container(
+                        margin: EdgeInsets.fromLTRB(5.h, 8.v, 9.h, 6.v),
+                        child: CustomImageView(
+                            imagePath: ImageConstant.imgVideocamera,
+                            height: 22.adaptSize,
+                            width: 22.adaptSize)),
+                    prefixConstraints: BoxConstraints(maxHeight: 36.v),
+                    onTap: () {
+                      _showAboutDialog(context);
+                    },
+                  )),
+              SizedBox(height: 19.v),
+              Padding(
+                  padding: EdgeInsets.only(left: 21.h, right: 60.h),
+                  child: CustomDropDownButton(
+                      hintText: "Feedback",
+                      items: dropdownItemList2,
+                      prefix: Container(
+                          margin: EdgeInsets.fromLTRB(4.h, 6.v, 8.h, 6.v),
+                          child: CustomImageView(
+                              imagePath: ImageConstant.imgFeedback,
+                              height: 24.adaptSize,
+                              width: 24.adaptSize)),
+                      prefixConstraints: BoxConstraints(maxHeight: 36.v),
+                      onTap: () {
+                        _showFeedbackDialog(context);
+                      })),
+              SizedBox(height: 21.v),
+              Padding(
+                  padding: EdgeInsets.only(left: 21.h, right: 60.h),
+                  child: CustomDropDownButton(
+                      hintText: "Help",
+                      items: dropdownItemList3,
+                      prefix: Container(
+                          margin: EdgeInsets.fromLTRB(4.h, 6.v, 7.h, 6.v),
+                          child: CustomImageView(
+                              imagePath: ImageConstant.imgHelp,
+                              height: 24.adaptSize,
+                              width: 24.adaptSize)),
+                      prefixConstraints: BoxConstraints(maxHeight: 36.v),
+                      onTap: () {
+                        _showHelpDialog(context);
+                      })),
+              SizedBox(height: 20.v),
+              Padding(
+                  padding: EdgeInsets.only(left: 21.h, right: 60.h),
+                  child: CustomDropDownButton(
+                      hintText: "Share",
+                      items: dropdownItemList4,
+                      prefix: Container(
+                          margin: EdgeInsets.fromLTRB(4.h, 6.v, 6.h, 6.v),
+                          child: CustomImageView(
+                              imagePath: ImageConstant.imgShare,
+                              height: 24.adaptSize,
+                              width: 24.adaptSize)),
+                      prefixConstraints: BoxConstraints(maxHeight: 36.v),
+                      onChanged: (value) {})),
               SizedBox(height: 66.0),
               Align(
                 alignment: Alignment.center,
@@ -214,6 +263,138 @@ class SettingsScreen extends StatelessWidget {
             height: 50,
             width: 50,
           ),
+        );
+      },
+    );
+  }
+
+  void _showTermsAndConditionsDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return SimpleDialog(
+          title: Text("Terms and Conditions"),
+          contentPadding:
+              EdgeInsets.symmetric(vertical: 16.0, horizontal: 24.0),
+          children: [
+            Text(
+              """
+Document Summarization:
+
+1. Accuracy of Summaries:
+
+  While the App employs advanced summarization algorithms, the accuracy of summaries cannot be guaranteed. Users should verify the generated summaries for critical applications.
+
+2. Intellectual Property:
+
+  Users retain ownership of the content they upload. By uploading, users grant SummarNote the right to use, modify, and store the content for the purpose of providing the summarization service.""",
+              style: TextStyle(fontSize: 16.0),
+            ),
+            // You can add more Text widgets or any other widgets as needed
+          ],
+        );
+      },
+    );
+  }
+
+  void _showHelpDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Help"),
+          content: Container(
+            width: double.maxFinite,
+            height: 300, // Set a fixed height or adjust as needed
+            child: ListView.builder(
+              itemCount: 1, // Only one item in the ListView
+              itemBuilder: (BuildContext context, int index) {
+                return Text(
+                  """
+1. AI-Powered Summarization:
+
+1.1. Summarization Process:
+
+Once a document is uploaded, the intelligent system will process it to generate a summary. This may take a few moments.
+
+2. Troubleshooting:
+
+2.1. Document Not Summarized:
+
+If a document is not summarized, check the document format and size. Ensure it meets the supported criteria.
+
+2.2. App Performance Issues:
+
+If you experience performance issues, try clearing your browser cache or restarting the mobile application. For persistent issues, contact our support team.
+
+3. Contact Support:
+
+3.1. Technical Assistance:
+
+For technical assistance or general inquiries, contact our support team at support@summarnote.com.
+                """,
+                  style: TextStyle(fontSize: 16.0),
+                );
+              },
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: Text("Close"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showFeedbackDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Feedback Form"),
+          content: Column(
+            children: [
+              Text(
+                "Please provide your feedback below:",
+                style: TextStyle(fontSize: 16.0),
+              ),
+              SizedBox(height: 16.0),
+              TextFormField(
+                decoration: InputDecoration(
+                  labelText: "Your Feedback",
+                  border: OutlineInputBorder(),
+                ),
+                maxLines: 3,
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: Text("Cancel"),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                // Process the feedback (you can add your logic here)
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.yellow,
+                  textStyle: TextStyle(fontSize: 18.0),
+                  fixedSize: Size(100, 70)
+                  // Change the background color
+                  ),
+              child:
+                  Text("   Submit   ", style: TextStyle(color: Colors.black)),
+            ),
+          ],
         );
       },
     );

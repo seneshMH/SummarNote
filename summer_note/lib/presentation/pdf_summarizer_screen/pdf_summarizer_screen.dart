@@ -236,7 +236,7 @@ class _PdfSummarizerScreenState extends State<PdfSummarizerScreen> {
           ),
           SizedBox(height: 4.v),
           Text(
-            "PDF File Summarizer",
+            "Summarizer",
             style: theme.textTheme.titleLarge,
           ),
           SizedBox(height: 2.v),

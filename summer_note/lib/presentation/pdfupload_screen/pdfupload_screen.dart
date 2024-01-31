@@ -51,7 +51,7 @@ class _PdfuploadScreenState extends State<PdfuploadScreen> {
       decoration: AppDecoration.outlineBlack900014
           .copyWith(borderRadius: BorderRadiusStyle.roundedBorder10),
       child: Column(mainAxisSize: MainAxisSize.min, children: [
-        Text("Upload PDF File Here", style: CustomTextStyles.titleLargeInter),
+        Text("Upload File Here", style: CustomTextStyles.titleLargeInter),
         SizedBox(height: 14.v),
         CustomImageView(
             imagePath: ImageConstant.imgIcon, height: 66.v, width: 90.h),

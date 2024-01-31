@@ -23,6 +23,7 @@ class CustomDropDown extends StatelessWidget {
     this.filled = true,
     this.validator,
     this.onChanged,
+    this.onTap,
   }) : super(
           key: key,
         );
@@ -65,6 +66,8 @@ class CustomDropDown extends StatelessWidget {
 
   final Function(String)? onChanged;
 
+  final Function()? onTap;
+
   @override
   Widget build(BuildContext context) {
     return alignment != null
@@ -97,6 +100,7 @@ class CustomDropDown extends StatelessWidget {
           onChanged: (value) {
             onChanged!(value.toString());
           },
+          onTap: onTap,
         ),
       );
   InputDecoration get decoration => InputDecoration(
