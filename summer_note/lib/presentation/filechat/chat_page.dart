@@ -53,10 +53,10 @@ class _ChatPageState extends State<ChatPage> {
               inputBorderRadius: BorderRadius.zero,
               receivedMessageBodyTextStyle: TextStyle(color: Colors.white),
               secondaryColor: Color(0xFF1c1c1c),
-              attachmentButtonIcon: Icon(
-                Icons.camera_alt_outlined,
-                color: Colors.white,
-              ),
+              // attachmentButtonIcon: Icon(   //TODO: add attachment button
+              //   Icons.camera_alt_outlined,
+              //   color: Colors.white,
+              // ),
               inputBackgroundColor: Color(0xFF1c1c1c),
               seenIcon: Text(
                 'read',
