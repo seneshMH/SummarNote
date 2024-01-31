@@ -2,7 +2,6 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:summer_note/core/app_export.dart';
 import 'package:summer_note/utils/ip.dart';
-import 'package:summer_note/widgets/custom_drop_down.dart';
 import 'package:summer_note/widgets/custom_drop_down_button.dart';
 
 // ignore_for_file: must_be_immutable
@@ -14,6 +13,7 @@ class SettingsScreen extends StatelessWidget {
   List<String> dropdownItemList4 = [];
 
   late TextEditingController ipAddressController = TextEditingController();
+  late TextEditingController feedbackController = TextEditingController();
 
   SettingsScreen({Key? key}) : super(key: key) {
     _initializeController();
@@ -370,6 +370,7 @@ For technical assistance or general inquiries, contact our support team at suppo
                   border: OutlineInputBorder(),
                 ),
                 maxLines: 3,
+                controller: feedbackController,
               ),
             ],
           ),
@@ -382,17 +383,13 @@ For technical assistance or general inquiries, contact our support team at suppo
             ),
             ElevatedButton(
               onPressed: () {
-                // Process the feedback (you can add your logic here)
-                Navigator.of(context).pop(); // Close the dialog
+                submit(context);
               },
               style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.yellow,
                   textStyle: TextStyle(fontSize: 18.0),
-                  fixedSize: Size(100, 70)
-                  // Change the background color
-                  ),
-              child:
-                  Text("   Submit   ", style: TextStyle(color: Colors.black)),
+                  fixedSize: Size(100, 70)),
+              child: Text("Submit", style: TextStyle(color: Colors.black)),
             ),
           ],
         );
@@ -400,12 +397,40 @@ For technical assistance or general inquiries, contact our support team at suppo
     );
   }
 
+  void submit(BuildContext context) async {
+    if (feedbackController.text == "") {
+      Navigator.of(context).pop();
+    }
+
+    Dio dio = Dio();
+
+    try {
+      String feedback = feedbackController.text;
+
+      String ipAddress = await IP.loadIpAddress();
+
+      Response response = await dio
+          .post('http://$ipAddress/feedback', data: {"feedback": feedback});
+
+      // Check the response status
+      if (response.statusCode == 200) {
+        _showSnackBar(context, 'Thank you for the feedback !');
+      } else {
+        _showSnackBar(
+            context, 'Failed to connect. Status code: ${response.statusCode}');
+      }
+
+      Navigator.of(context).pop();
+    } catch (error) {
+      _showSnackBar(context, 'Error connecting : $error');
+    }
+  }
+
   void debugConnection(String ipAddress, BuildContext context) async {
     // Initialize Dio
     Dio dio = Dio();
 
     try {
-      print(ipAddress);
       // Send a GET request to the "/ping" route
       Response response = await dio.get('http://$ipAddress/ping');
 
