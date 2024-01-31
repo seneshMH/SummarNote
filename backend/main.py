@@ -113,6 +113,7 @@ async def upload_file_chat(file: UploadFile = File(...)):
 @app.websocket("/ws")
 async def websocket_endpoint(websocket : WebSocket):
     await websocket.accept()
+    answer = ""
 
     while True:
         message = await websocket.receive()
@@ -130,8 +131,10 @@ async def websocket_endpoint(websocket : WebSocket):
                 break
             if USE_GEMINI:
                 answer = process_answer_gemini(message['text'])
+                answer = answer["output_text"]
             else:
                 answer = process_answer_local({'query': message['text']},base_model,tokenizer)
+                print(answer)
                 # response = chat.send_message([message['text']],stream=True)
 
         # for chunk in answer:
@@ -150,6 +153,20 @@ async def extract_best(data: dict):
         best_sentences = extract(text,percentage)
         print(best_sentences)
         return {"best_sentences": best_sentences}
+    
+
+@app.post("/feedback")
+async def get_feedback(data: dict):
+    feedback = data.get('feedback')
+    if feedback is None:
+        raise HTTPException(400, detail="Invalid feedback")
+    else:
+        # save feedback to txt file
+        with open("feedback/feedback.txt", "a") as f:
+            f.write(feedback+"\n")
+            f.write("--------------------------------------------------\n")
+
+        return {"feedback": "Sussesfully received"}
 
 #ping route
 @app.get("/ping")

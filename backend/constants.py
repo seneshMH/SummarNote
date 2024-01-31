@@ -7,7 +7,7 @@ USE_PIPELINE = "text2text-generation"
 CHECKPOINT = "models/LaMini-Flan-T5-248M"
 INGEST_THREADS = os.cpu_count() or 8
 
-USE_GEMINI = False
+USE_GEMINI = True
 
 DOCUMENT_MAP = {
     ".txt": TextLoader,
