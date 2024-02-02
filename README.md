@@ -42,4 +42,6 @@ We would like to thank the following group members for their valuable contributi
 
 ---
 
-![SummarNote](/resources/home.jpg?raw=true "SummarNote")
+<p align="center">
+  <img src="/resources/home.jpg?raw=true" alt="SummarNote" width="400" height="300">
+</p>
