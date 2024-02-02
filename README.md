@@ -43,5 +43,5 @@ We would like to thank the following group members for their valuable contributi
 ---
 
 <p align="center">
-  <img src="/resources/home.jpg?raw=true" alt="SummarNote" width="400" height="600">
+  <img src="/resources/home.jpg?raw=true" alt="SummarNote" width="400" height="800">
 </p>
